@@ -4,10 +4,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <cmath>
-#include <array>
-#include <vector>
 
 using namespace std;
 
@@ -37,7 +33,19 @@ protected:
 /////////////////////////////////////////
 // Tests start here
 
-TEST_F(test_Trie, InitTrieNode){
- 
+TEST_F(test_Trie, TestInitialization){
+	Trie trie;
+	shared_ptr<trie_node> root = trie.GetRoot();
+
+	// Test that the root is properly created
+	ASSERT_TRUE(root);
+	ASSERT_FALSE(root->is_end_of_word);
+	ASSERT_FALSE(root->letter);
+	ASSERT_EQ(root->children.size(), 26);
+
+	// All children should be null at first
+	for (auto child : root->children) {
+		ASSERT_FALSE(child);
+	}
 }
 

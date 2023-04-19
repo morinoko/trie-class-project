@@ -18,9 +18,12 @@ class Trie {
     public:
         Trie(); // Constructor
         ~Trie(); // Destructor
+        shared_ptr<trie_node> GetRoot();
         
     private:
+        shared_ptr<trie_node> root;
         shared_ptr<trie_node> InitTrieNode(char letter);
+        void SetRoot(shared_ptr<trie_node> new_root);
 };
 
 #endif  // TRIE_H__
