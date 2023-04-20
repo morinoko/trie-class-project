@@ -1,7 +1,7 @@
 #include "Trie.h"
 
 Trie::Trie() {
-    shared_ptr<trie_node> root = InitTrieNode(NULL);
+    shared_ptr<trie_node> root = InitTrieNode('\0');
     SetRoot(root);
 }
 
