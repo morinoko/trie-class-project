@@ -28,6 +28,9 @@ protected:
 /////////////////////////////////////////
 // Test Helper Functions
 /////////////////////////////////////////
+int letter_index(char letter) {
+	return letter - 'a';
+}
 
 
 /////////////////////////////////////////
@@ -47,5 +50,53 @@ TEST_F(test_Trie, TestInitialization){
 	for (auto child : root->children) {
 		ASSERT_FALSE(child);
 	}
+}
+
+TEST_F(test_Trie, TestInsert) {
+	Trie trie;
+	trie.Insert("dog");
+
+	shared_ptr<trie_node> root = trie.GetRoot();
+
+	int d_index = letter_index('d');
+	int o_index = letter_index('o');
+	int g_index = letter_index('g');
+
+	shared_ptr<trie_node> d_node = root->children.at(d_index);
+	ASSERT_TRUE(d_index);
+	ASSERT_EQ(d_node->letter, 'd');
+	ASSERT_FALSE(d_node->is_end_of_word);
+
+	shared_ptr<trie_node> o_node = root->children.at(o_index);
+	ASSERT_TRUE(o_index);
+	ASSERT_EQ(o_node->letter, 'o');
+	ASSERT_FALSE(o_node->is_end_of_word);
+
+	shared_ptr<trie_node> g_node = root->children.at(g_index);
+	ASSERT_TRUE(g_index);
+	ASSERT_EQ(g_node->letter, 'g');
+	ASSERT_TRUE(g_node->is_end_of_word);
+
+	// Test overlapping words
+	trie.Insert("dogs");
+	int s_index = letter_index('s');
+
+	// Make sure prior nodes are unaffected
+	ASSERT_TRUE(d_index);
+	ASSERT_EQ(d_node->letter, 'd');
+	ASSERT_FALSE(d_node->is_end_of_word);
+
+	ASSERT_TRUE(o_index);
+	ASSERT_EQ(o_node->letter, 'o');
+	ASSERT_FALSE(o_node->is_end_of_word);
+
+	ASSERT_TRUE(g_index);
+	ASSERT_EQ(g_node->letter, 'g');
+	ASSERT_TRUE(g_node->is_end_of_word);
+
+	shared_ptr<trie_node> s_node = root->children.at(s_index);
+	ASSERT_TRUE(s_index);
+	ASSERT_EQ(s_node->letter, 's');
+	ASSERT_TRUE(s_node->is_end_of_word);
 }
 
