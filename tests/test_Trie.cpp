@@ -63,17 +63,17 @@ TEST_F(test_Trie, TestInsert) {
 	int g_index = letter_index('g');
 
 	shared_ptr<trie_node> d_node = root->children.at(d_index);
-	ASSERT_TRUE(d_index);
+	ASSERT_TRUE(d_node);
 	ASSERT_EQ(d_node->letter, 'd');
 	ASSERT_FALSE(d_node->is_end_of_word);
 
-	shared_ptr<trie_node> o_node = root->children.at(o_index);
-	ASSERT_TRUE(o_index);
+	shared_ptr<trie_node> o_node = d_node->children.at(o_index);
+	ASSERT_TRUE(o_node);
 	ASSERT_EQ(o_node->letter, 'o');
 	ASSERT_FALSE(o_node->is_end_of_word);
 
-	shared_ptr<trie_node> g_node = root->children.at(g_index);
-	ASSERT_TRUE(g_index);
+	shared_ptr<trie_node> g_node = o_node->children.at(g_index);
+	ASSERT_TRUE(g_node);
 	ASSERT_EQ(g_node->letter, 'g');
 	ASSERT_TRUE(g_node->is_end_of_word);
 
@@ -82,21 +82,40 @@ TEST_F(test_Trie, TestInsert) {
 	int s_index = letter_index('s');
 
 	// Make sure prior nodes are unaffected
-	ASSERT_TRUE(d_index);
 	ASSERT_EQ(d_node->letter, 'd');
 	ASSERT_FALSE(d_node->is_end_of_word);
 
-	ASSERT_TRUE(o_index);
 	ASSERT_EQ(o_node->letter, 'o');
 	ASSERT_FALSE(o_node->is_end_of_word);
 
-	ASSERT_TRUE(g_index);
 	ASSERT_EQ(g_node->letter, 'g');
 	ASSERT_TRUE(g_node->is_end_of_word);
 
-	shared_ptr<trie_node> s_node = root->children.at(s_index);
-	ASSERT_TRUE(s_index);
+	shared_ptr<trie_node> s_node = g_node->children.at(s_index);
+	ASSERT_TRUE(s_node);
 	ASSERT_EQ(s_node->letter, 's');
 	ASSERT_TRUE(s_node->is_end_of_word);
+
+	// Test insert shorter word that is a part of an existing word
+	trie.Insert("do");
+
+	ASSERT_TRUE(o_node->is_end_of_word);
+}
+
+TEST_F(test_Trie, TestSearch) {
+	Trie trie;
+	trie.Insert("catnip");
+	trie.Insert("cats");
+
+	// Make sure inserted words can be found
+	ASSERT_TRUE(trie.Search("cats"));
+	ASSERT_TRUE(trie.Search("catnip"));
+
+	// Make sure words simply not present in the trie return false
+	ASSERT_FALSE(trie.Search("dog"));
+
+	// Even if a prefix is present, it's not in the trie unless it was inserted and the
+	// last letter was marked as being the end of a word.
+	ASSERT_FALSE(trie.Search("cat"));
 }
 

@@ -14,7 +14,7 @@ void Trie::Insert(const string& word) {
     RecursiveInsert(root, word, 0);
 }
 
-void Trie::RecursiveInsert(shared_ptr<trie_node> node, const string& word, int current_letter_index) {
+void Trie::RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int current_letter_index) {
     // Base case: The index of the letter has surpassed end of word
     if (current_letter_index >= word.length()) {
         return;
@@ -24,9 +24,17 @@ void Trie::RecursiveInsert(shared_ptr<trie_node> node, const string& word, int c
 
     // If letter is already in node, move to that node and check the next letter
     if (IsLetterInNode(letter, node)) {
-        // move letter index to next letter
-        current_letter_index++;
-        RecursiveInsert(node->children.at(current_letter_index), word, current_letter_index);
+        // Grab the next node
+        int next_node_index = LetterIndex(letter);
+        shared_ptr<trie_node> next_node = node->children.at(next_node_index);
+
+        // If the new word is a subset of an existing word, and the next node is the end,
+        // mark the node to an end of a word
+        if (current_letter_index == word.length() - 1) {
+            next_node->is_end_of_word = true;
+        }
+
+        RecursiveInsert(next_node, word, current_letter_index + 1);
     }
     // Letter is not in node, insert it 
     else {
@@ -45,8 +53,6 @@ void Trie::RecursiveInsert(shared_ptr<trie_node> node, const string& word, int c
         current_letter_index++;
         RecursiveInsert(new_node, word, current_letter_index);
     }
-
-    
 }
 
 void Trie::Remove(string word) {
@@ -54,7 +60,32 @@ void Trie::Remove(string word) {
 }
 
 bool Trie::Search(string word) {
-    return false;
+    // Start at root
+    shared_ptr<trie_node> cursor = GetRoot();
+    bool found = false;
+
+    // For each letter in the word, traverse the trie tree.
+    for (int i = 0; i < word.length(); i++) {
+        char letter = word.at(i);
+
+        if (IsLetterInNode(letter, cursor)) {
+            // If the letter is present in the cursor's children, check that letter's node
+            int letter_index = LetterIndex(letter);
+            cursor = cursor->children.at(letter_index);
+
+            // If each letter has been found up until now, and the last letter is at a node that is the end of the word, 
+            // the word was found.
+            if (i == (word.length() - 1) && cursor->is_end_of_word) {
+                found = true;
+            }
+        } 
+        // If the next letter isn't present in the sequence at any point, break out of the loop
+        else {
+            break;
+        }
+    }
+
+    return found;
 }
 
 vector<string> Trie::SuggestionsForPrefix(string prefix) {

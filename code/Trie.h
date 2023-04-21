@@ -49,7 +49,7 @@ class Trie {
         // Returns the index of the given character
         int LetterIndex(char letter);
 
-        void RecursiveInsert(shared_ptr<trie_node> node, const string& word, int current_letter_index);
+        void RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int current_letter_index);
 };
 
 #endif  // TRIE_H__
