@@ -56,7 +56,67 @@ void Trie::RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int 
 }
 
 void Trie::Remove(string word) {
+    // If the work is not in the trie, don't do anything
+    if (!Search(word)) { return; }
 
+    // traverse tree and create map of letter nodes for each character in word.
+    vector<shared_ptr<trie_node>> letter_node_list = BuildLetterNodeList(word);
+
+    // Iterate the list starting at the last letter
+    for (int i = word.length() - 1; i >= 0; i--) {
+        shared_ptr<trie_node> current_node = letter_node_list.at(i);
+
+        // If there are branches off of that letter, then nothing can be deleted from this point
+        vector<shared_ptr<trie_node>> child_letters = GetChildLetters(current_node);
+        
+        // If there are children, the current node can't be deleted, but we need to remove the is_end_of_word marker
+        if (child_letters.size() > 1) {
+            // If it's the node for the last letter, make sure that it is no longer considered 
+            // the end of a word
+            if (i == word.length() - 1) {
+                current_node->is_end_of_word = false;
+            }
+
+            break;
+        }
+        // If no children, we can remove the node
+        else {
+            shared_ptr<trie_node> parent_node = letter_node_list.at(i - 1);
+            int letter_index = LetterIndex(current_node->letter);
+            
+            parent_node->children.at(letter_index) = shared_ptr<trie_node>(NULL);
+        }
+    }
+}
+
+// Assumes the word is in the trie
+vector<shared_ptr<trie_node>> Trie::BuildLetterNodeList(string word) {
+    vector<shared_ptr<trie_node>> letter_node_list;
+    shared_ptr<trie_node> cursor = GetRoot();
+    
+    // For each letter in the word, traverse the trie tree.
+    for (int i = 0; i < word.length(); i++) {
+        char letter = word.at(i);
+        int letter_index = LetterIndex(letter);
+        cursor = cursor->children.at(letter_index);
+
+        // Insert the node corresponding to the character
+        letter_node_list.push_back(cursor);
+    }
+
+    return letter_node_list;
+}
+
+vector<shared_ptr<trie_node>> Trie::GetChildLetters(shared_ptr<trie_node> node) {
+    vector<shared_ptr<trie_node>> children;
+
+    for (auto child : node->children) {
+        if (child) {
+            children.push_back(child);
+        }
+    }
+
+    return children;
 }
 
 bool Trie::Search(string word) {

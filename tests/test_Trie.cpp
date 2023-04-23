@@ -119,3 +119,12 @@ TEST_F(test_Trie, TestSearch) {
 	ASSERT_FALSE(trie.Search("cat"));
 }
 
+TEST_F(test_Trie, TestRemove) {
+	Trie trie;
+	trie.Insert("cats");
+
+	// Basic removal
+	trie.Remove("cats");
+	ASSERT_FALSE(trie.Search("cats"));
+}
+

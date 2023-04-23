@@ -49,7 +49,14 @@ class Trie {
         // Returns the index of the given character
         int LetterIndex(char letter);
 
+        // Recursive helper for insert
         void RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int current_letter_index);
+
+        // Builds a vector of trie nodes corresponding to each character in a word in order
+        vector<shared_ptr<trie_node>> BuildLetterNodeList(string word);
+        
+        // Get all the direct child letters of a node
+        vector<shared_ptr<trie_node>> GetChildLetters(shared_ptr<trie_node> node);
 };
 
 #endif  // TRIE_H__
