@@ -62,7 +62,7 @@ void Trie::Remove(string word) {
     // traverse tree and create map of letter nodes for each character in word.
     vector<shared_ptr<trie_node>> letter_node_list = BuildLetterNodeList(word);
 
-    // Iterate the list starting at the last letter
+    // Iterate the list starting at the last letter of the word
     for (int i = word.length() - 1; i >= 0; i--) {
         shared_ptr<trie_node> current_node = letter_node_list.at(i);
 
@@ -70,7 +70,7 @@ void Trie::Remove(string word) {
         vector<shared_ptr<trie_node>> child_letters = GetChildLetters(current_node);
         
         // If there are children, the current node can't be deleted, but we need to remove the is_end_of_word marker
-        if (child_letters.size() > 1) {
+        if (child_letters.size() > 0) {
             // If it's the node for the last letter, make sure that it is no longer considered 
             // the end of a word
             if (i == word.length() - 1) {
@@ -79,12 +79,25 @@ void Trie::Remove(string word) {
 
             break;
         }
-        // If no children, we can remove the node
+        // If no children, we can remove the node if its not part of another word
         else {
-            shared_ptr<trie_node> parent_node = letter_node_list.at(i - 1);
+            // If it's not the end of the word itself, but we encounter a different word's end,
+            // then there is a sub-word within the word we're removing, and it shouldn't be deleted
+            if (i != word.length() - 1 && current_node->is_end_of_word) {
+                break;
+            }
+
             int letter_index = LetterIndex(current_node->letter);
-            
-            parent_node->children.at(letter_index) = shared_ptr<trie_node>(NULL);
+
+            // If we're at the first letter in the world, the parent is the root
+            if (i == 0) {
+                shared_ptr<trie_node> parent_node = GetRoot();
+                parent_node->children.at(letter_index) = shared_ptr<trie_node>(NULL);
+            }
+            else {
+                shared_ptr<trie_node> parent_node = letter_node_list.at(i - 1);
+                parent_node->children.at(letter_index) = shared_ptr<trie_node>(NULL);
+            }
         }
     }
 }

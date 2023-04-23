@@ -119,12 +119,46 @@ TEST_F(test_Trie, TestSearch) {
 	ASSERT_FALSE(trie.Search("cat"));
 }
 
-TEST_F(test_Trie, TestRemove) {
+TEST_F(test_Trie, TestBasicRemove) {
 	Trie trie;
 	trie.Insert("cats");
 
 	// Basic removal
 	trie.Remove("cats");
 	ASSERT_FALSE(trie.Search("cats"));
+
+	// Removing word that isn't in trie
+	trie.Insert("cats");
+	trie.Remove("cat");
+	ASSERT_FALSE(trie.Search("cat"));
+	ASSERT_TRUE(trie.Search("cats")); // make sure other word isn't affected
 }
 
+TEST_F(test_Trie, TestRemoveWithBranches) {
+	Trie trie;
+
+	// Removal of word when there are two separate branchs in trie
+	trie.Insert("geckos");
+	trie.Insert("lions");
+
+	trie.Remove("geckos");
+	ASSERT_FALSE(trie.Search("geckos"));
+	trie.Remove("lions");
+	ASSERT_FALSE(trie.Search("lions"));
+
+	// Remove shorter word that is a sub-word of a longer word
+	trie.Insert("cats");
+	trie.Insert("cat");
+
+	trie.Remove("cat");
+	ASSERT_TRUE(trie.Search("cats"));
+	ASSERT_FALSE(trie.Search("cat"));
+
+	// Remove longer word when there are also sub-words
+	trie.Insert("cats");
+	trie.Insert("cat");
+
+	trie.Remove("cats");
+	ASSERT_FALSE(trie.Search("cats"));
+	ASSERT_TRUE(trie.Search("cat"));
+}
