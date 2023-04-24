@@ -57,6 +57,9 @@ class Trie {
         
         // Get all the direct child letters of a node
         vector<shared_ptr<trie_node>> GetChildLetters(shared_ptr<trie_node> node);
+
+        // Returns a pointer to the last letter node of a prefix
+        shared_ptr<trie_node> FindEndOfPrefix(string prefix);
 };
 
 #endif  // TRIE_H__

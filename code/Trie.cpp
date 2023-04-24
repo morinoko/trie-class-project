@@ -162,7 +162,37 @@ bool Trie::Search(string word) {
 }
 
 vector<string> Trie::SuggestionsForPrefix(string prefix) {
-    return vector<string>(0);
+    // Return empty list if prefix is an empty string
+    if (prefix.length() == 0) {
+        return vector<string>(0);
+    }
+
+    // Find the node for the last letter in the prefix
+    shared_ptr<trie_node> prefix_last_letter = FindEndOfPrefix(prefix);
+
+    // If the last letter is null, the prefix isn't in the trie, so return an empty vector
+    if (!prefix_last_letter) { 
+        return vector<string>(0); 
+    }
+}
+
+shared_ptr<trie_node> Trie::FindEndOfPrefix(string prefix) {
+    shared_ptr<trie_node> cursor = GetRoot();
+
+    for (int i = 0; i < prefix.length(); i++) {
+        // Get index of node for the current letter
+        int letter_index = LetterIndex(prefix.at(i));
+        
+        // The letter node is the current cursor's child at that index
+        cursor = cursor->children.at(letter_index);
+
+        // If that child doesn't exist, the prefix isn't in the trie, so we can break out of the loop
+        if (!cursor) {
+            break;
+        }
+    }
+
+    return cursor;
 }
 
 shared_ptr<trie_node> Trie::InitTrieNode(char letter) {

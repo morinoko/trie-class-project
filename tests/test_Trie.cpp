@@ -162,3 +162,17 @@ TEST_F(test_Trie, TestRemoveWithBranches) {
 	ASSERT_FALSE(trie.Search("cats"));
 	ASSERT_TRUE(trie.Search("cat"));
 }
+
+TEST_F(test_Trie, TestSuggestionsForPrefix) {
+	vector<string> suggestions;
+	Trie trie;
+	trie.Insert("cat");
+	
+	// When prefix is an empty string
+	suggestions = trie.SuggestionsForPrefix("");
+	ASSERT_EQ(suggestions.size(), 0);
+
+	// When prefix doesn't exist in the trie
+	suggestions = trie.SuggestionsForPrefix("ch");
+	ASSERT_EQ(suggestions.size(), 0);
+}
