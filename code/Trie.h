@@ -60,6 +60,9 @@ class Trie {
 
         // Returns a pointer to the last letter node of a prefix
         shared_ptr<trie_node> FindEndOfPrefix(string prefix);
+
+        // Recursive helper for finding suggestions
+        void RecursiveSuggestionsForPrefix(vector<string>& suggestions, shared_ptr<trie_node> prefix_last_letter, string prefix);
 };
 
 #endif  // TRIE_H__

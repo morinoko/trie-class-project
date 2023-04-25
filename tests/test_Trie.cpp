@@ -32,7 +32,6 @@ int letter_index(char letter) {
 	return letter - 'a';
 }
 
-
 /////////////////////////////////////////
 // Tests start here
 
@@ -163,7 +162,7 @@ TEST_F(test_Trie, TestRemoveWithBranches) {
 	ASSERT_TRUE(trie.Search("cat"));
 }
 
-TEST_F(test_Trie, TestSuggestionsForPrefix) {
+TEST_F(test_Trie, TestSuggestionsForPrefixNoResults) {
 	vector<string> suggestions;
 	Trie trie;
 	trie.Insert("cat");
@@ -174,5 +173,31 @@ TEST_F(test_Trie, TestSuggestionsForPrefix) {
 
 	// When prefix doesn't exist in the trie
 	suggestions = trie.SuggestionsForPrefix("ch");
+	ASSERT_EQ(suggestions.size(), 0);
+}
+
+TEST_F(test_Trie, TestSuggestionsForPrefix) {
+	vector<string> suggestions;
+	vector<string> expected;
+	Trie trie;
+	trie.Insert("cat");
+	trie.Insert("cats");
+	trie.Insert("catsup");
+	trie.Insert("catch");
+	trie.Insert("catacomb");
+	trie.Insert("dogs");
+	
+	suggestions = trie.SuggestionsForPrefix("ca");
+	expected = vector<string> { "cat", "catacomb", "catch", "cats", "catsup", };
+	ASSERT_EQ(suggestions.size(), 5);
+	EXPECT_EQ(suggestions, expected);
+
+
+	suggestions = trie.SuggestionsForPrefix("cats");
+	expected = vector<string> { "cats", "catsup", };
+	ASSERT_EQ(suggestions.size(), 2);
+	EXPECT_EQ(suggestions, expected);
+
+	suggestions = trie.SuggestionsForPrefix("catacombs");
 	ASSERT_EQ(suggestions.size(), 0);
 }

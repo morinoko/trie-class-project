@@ -162,9 +162,11 @@ bool Trie::Search(string word) {
 }
 
 vector<string> Trie::SuggestionsForPrefix(string prefix) {
+    vector<string> suggestions;
+
     // Return empty list if prefix is an empty string
     if (prefix.length() == 0) {
-        return vector<string>(0);
+        return suggestions;
     }
 
     // Find the node for the last letter in the prefix
@@ -172,7 +174,31 @@ vector<string> Trie::SuggestionsForPrefix(string prefix) {
 
     // If the last letter is null, the prefix isn't in the trie, so return an empty vector
     if (!prefix_last_letter) { 
-        return vector<string>(0); 
+        return suggestions; 
+    }
+
+    // Recursively find all the suggestions for prefix
+    RecursiveSuggestionsForPrefix(suggestions, prefix_last_letter, prefix);
+
+    return suggestions;
+}
+
+void Trie::RecursiveSuggestionsForPrefix(vector<string>& suggestions, shared_ptr<trie_node> prefix_last_letter, string prefix) {
+    if (prefix_last_letter->is_end_of_word) {
+        suggestions.push_back(prefix);
+    }
+
+    vector<shared_ptr<trie_node>> children = GetChildLetters(prefix_last_letter);
+
+    // If there are no children we don't need to go any further
+    if (children.empty()) { return; }
+
+    // Check each child
+    for (auto child : children) {
+        // Build onto the prefix by adding the next letter in the sequence
+        string prefix_with_child = prefix + child->letter;
+
+        RecursiveSuggestionsForPrefix(suggestions, child, prefix_with_child);
     }
 }
 
