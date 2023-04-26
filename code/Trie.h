@@ -33,10 +33,10 @@ class Trie {
         // Search for a word in the trie. Returns true if found, false if not
         bool Search(const string& word);
 
-        // Retuns a list of all words in the trie
+        // Retuns a list of all words in the trie in alphabetical order
         vector<string> GetAllWords();
 
-        // Prints all words in the trie
+        // Prints all words in the trie in alphabetical order
         void Print();
 
         // Returns a list of possible words for a given prefix.
