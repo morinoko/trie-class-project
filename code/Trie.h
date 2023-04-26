@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -27,10 +28,10 @@ class Trie {
         void Insert(const string& word);
 
         // Remove a word from the trie
-        void Remove(string word);
+        void Remove(const string& word);
 
         // Search for a word in the trie. Returns true if found, false if not
-        bool Search(string word);
+        bool Search(const string& word);
 
         // Returns a list of possible words for a given prefix.
         // If there are no possible words, an empty vector is returned.
@@ -48,6 +49,9 @@ class Trie {
 
         // Returns the index of the given character
         int LetterIndex(char letter);
+
+        // Validates the word only contains lowercase letters and no special characters
+        bool ValidateWord(const string& word);
 
         // Recursive helper for insert
         void RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int current_letter_index);

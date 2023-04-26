@@ -8,6 +8,13 @@ Trie::Trie() {
 Trie::~Trie() {}
 
 void Trie::Insert(const string& word) {
+    // If word is invalid, don't do anything
+    if (!ValidateWord(word)) { 
+        cout << "Words must be all lowercase letters with no symbols." << endl;
+
+        return;
+    }
+
     // Starting at the root, traverse down the trie's nodes, one step for each character in the word
     shared_ptr<trie_node> root = GetRoot();
     
@@ -55,7 +62,10 @@ void Trie::RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int 
     }
 }
 
-void Trie::Remove(string word) {
+void Trie::Remove(const string& word) {
+    // If word is invalid, don't do anything
+    if (!ValidateWord(word)) { return; }
+
     // If the work is not in the trie, don't do anything
     if (!Search(word)) { return; }
 
@@ -132,7 +142,12 @@ vector<shared_ptr<trie_node>> Trie::GetChildLetters(shared_ptr<trie_node> node) 
     return children;
 }
 
-bool Trie::Search(string word) {
+bool Trie::Search(const string& word) {
+    // If word is invalid, don't do anything and return false
+    if (!ValidateWord(word)) {
+        return false;
+    }
+
     // Start at root
     shared_ptr<trie_node> cursor = GetRoot();
     bool found = false;
@@ -164,8 +179,8 @@ bool Trie::Search(string word) {
 vector<string> Trie::SuggestionsForPrefix(string prefix) {
     vector<string> suggestions;
 
-    // Return empty list if prefix is an empty string
-    if (prefix.length() == 0) {
+    // Return empty list if prefix is an empty string or not valid
+    if (prefix.length() == 0 || !ValidateWord(prefix)) {
         return suggestions;
     }
 
@@ -241,6 +256,16 @@ shared_ptr<trie_node> Trie::GetRoot() {
 
 void Trie::SetRoot(shared_ptr<trie_node> new_root) {
     root = new_root;
+}
+
+bool Trie::ValidateWord(const string& word) {
+    for (auto character : word) {
+        if (character < 'a' || character > 'z') {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Trie::IsLetterInNode(char letter, shared_ptr<trie_node> node) {

@@ -101,6 +101,16 @@ TEST_F(test_Trie, TestInsert) {
 	ASSERT_TRUE(o_node->is_end_of_word);
 }
 
+TEST_F(test_Trie, TestInsertInvalidWord) {
+	Trie trie;
+	trie.Insert("UPPER");
+
+	// Make sure all the children in root are still empty
+	for (auto child : trie.GetRoot()->children) {
+		ASSERT_FALSE(child);
+	}
+}
+
 TEST_F(test_Trie, TestSearch) {
 	Trie trie;
 	trie.Insert("catnip");
@@ -116,6 +126,9 @@ TEST_F(test_Trie, TestSearch) {
 	// Even if a prefix is present, it's not in the trie unless it was inserted and the
 	// last letter was marked as being the end of a word.
 	ASSERT_FALSE(trie.Search("cat"));
+
+	// Test search of invalid word
+	ASSERT_FALSE(trie.Search("CAT"));
 }
 
 TEST_F(test_Trie, TestBasicRemove) {
@@ -173,6 +186,10 @@ TEST_F(test_Trie, TestSuggestionsForPrefixNoResults) {
 
 	// When prefix doesn't exist in the trie
 	suggestions = trie.SuggestionsForPrefix("ch");
+	ASSERT_EQ(suggestions.size(), 0);
+
+	// When prefix is an invalid word
+	suggestions = trie.SuggestionsForPrefix("--");
 	ASSERT_EQ(suggestions.size(), 0);
 }
 
