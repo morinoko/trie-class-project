@@ -236,6 +236,42 @@ shared_ptr<trie_node> Trie::FindEndOfPrefix(string prefix) {
     return cursor;
 }
 
+vector<string> Trie::GetAllWords() {
+    shared_ptr<trie_node> cursor = GetRoot();
+    vector<string> words;
+    string word = "";
+
+    RecursiveGetAllWords(words, cursor, word);
+
+    return words;
+}
+
+void Trie::RecursiveGetAllWords(vector<string>& words, shared_ptr<trie_node> cursor, string word) {
+    if (cursor->is_end_of_word) {
+        words.push_back(word);
+    }
+
+    vector<shared_ptr<trie_node>> children = GetChildLetters(cursor);
+
+    // If there are no children we don't need to go any further
+    if (children.empty()) { return; }
+
+    for (auto child : children) {
+        RecursiveGetAllWords(words, child, word + child->letter);
+    }
+}
+
+void Trie::Print() {
+    shared_ptr<trie_node> cursor = GetRoot();
+    string word = "";
+
+    vector<string> words = GetAllWords();
+
+    for (auto word : words) {
+        cout << word << endl;
+    }
+}
+
 shared_ptr<trie_node> Trie::InitTrieNode(char letter) {
     shared_ptr<trie_node> new_node (new trie_node);
 

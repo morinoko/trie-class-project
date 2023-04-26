@@ -33,6 +33,12 @@ class Trie {
         // Search for a word in the trie. Returns true if found, false if not
         bool Search(const string& word);
 
+        // Retuns a list of all words in the trie
+        vector<string> GetAllWords();
+
+        // Prints all words in the trie
+        void Print();
+
         // Returns a list of possible words for a given prefix.
         // If there are no possible words, an empty vector is returned.
         vector<string> SuggestionsForPrefix(string prefix);
@@ -55,6 +61,9 @@ class Trie {
 
         // Recursive helper for insert
         void RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int current_letter_index);
+        
+        // Recursive helper for getting all words in trie
+        void RecursiveGetAllWords(vector<string>& words, shared_ptr<trie_node> cursor, string word);
 
         // Builds a vector of trie nodes corresponding to each character in a word in order
         vector<shared_ptr<trie_node>> BuildLetterNodeList(string word);

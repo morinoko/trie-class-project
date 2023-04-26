@@ -218,3 +218,18 @@ TEST_F(test_Trie, TestSuggestionsForPrefix) {
 	suggestions = trie.SuggestionsForPrefix("catacombs");
 	ASSERT_EQ(suggestions.size(), 0);
 }
+
+TEST_F(test_Trie, TestGetAllWords) {
+	vector<string> expected;
+	Trie trie;
+	trie.Insert("apple");
+	trie.Insert("cat");
+	trie.Insert("bark");
+	trie.Insert("applesauce");
+	trie.Insert("catepillar");
+	trie.Insert("zebra");
+
+	vector<string> words = trie.GetAllWords();
+	expected = vector<string> { "apple", "applesauce", "bark", "cat", "catepillar", "zebra", };
+	ASSERT_EQ(words, expected);
+}
