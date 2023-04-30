@@ -274,7 +274,7 @@ void Trie::Print() {
     vector<string> words = GetAllWords();
 
     for (auto word : words) {
-        cout << word << endl;
+        cout << "- " << word << endl;
     }
 }
 
