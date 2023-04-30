@@ -233,3 +233,24 @@ TEST_F(test_Trie, TestGetAllWords) {
 	expected = vector<string> { "apple", "applesauce", "bark", "cat", "catepillar", "zebra", };
 	ASSERT_EQ(words, expected);
 }
+
+TEST_F(test_Trie, TestSize) {
+	Trie trie;
+
+	// Should be 0 when empty
+	ASSERT_EQ(trie.Size(), 0);
+
+	trie.Insert("apple");
+	trie.Insert("cat");
+	trie.Insert("bark");
+	trie.Insert("applesauce");
+	trie.Insert("catepillar");
+	trie.Insert("zebra");
+
+	ASSERT_EQ(trie.Size(), 6);
+
+	// After removal
+	trie.Remove("bark");
+
+	ASSERT_EQ(trie.Size(), 5);
+}

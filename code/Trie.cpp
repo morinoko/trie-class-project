@@ -261,6 +261,12 @@ void Trie::RecursiveGetAllWords(vector<string>& words, shared_ptr<trie_node> cur
     }
 }
 
+int Trie::Size() {
+    vector<string> all_words = GetAllWords();
+
+    return all_words.size();
+}
+
 void Trie::Print() {
     shared_ptr<trie_node> cursor = GetRoot();
     string word = "";

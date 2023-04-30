@@ -36,6 +36,9 @@ class Trie {
         // Retuns a list of all words in the trie in alphabetical order
         vector<string> GetAllWords();
 
+        // Returns how many words are in the trie
+        int Size();
+
         // Prints all words in the trie in alphabetical order
         void Print();
 
