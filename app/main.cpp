@@ -23,7 +23,36 @@ int main(int argc, char* argv[])
     cout << endl;
     cout << "Suggestions for prefix 'cat':" << endl;
 
-    vector<string> suggestions = trie.SuggestionsForPrefix("cat");
+    vector<string> suggestions;
+    suggestions = trie.SuggestionsForPrefix("cat");
+
+    for (auto suggestion : suggestions) {
+        cout << suggestion << endl;
+    }
+
+    cout << endl;
+    cout << "Loading dictionary..." << endl;
+    cout << endl;
+
+    fstream dictfile;
+    dictfile.open("../data/words.txt", ios::in);
+
+    if (dictfile.is_open()) {
+        string word;
+
+        while(getline(dictfile, word)) {
+            trie.Insert(word);
+        }
+
+        dictfile.close();
+    }
+
+    cout << "Finished loading dictionary!" << endl;
+    cout << endl;
+
+    suggestions = trie.SuggestionsForPrefix("comm");
+
+    cout << "Suggestions for prefix 'comm':" << endl;
 
     for (auto suggestion : suggestions) {
         cout << suggestion << endl;
