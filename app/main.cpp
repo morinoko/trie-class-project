@@ -29,6 +29,10 @@ int main(int argc, char* argv[])
     trie.Insert("catch");
     trie.Insert("zebra");
 
+    cout << "Attempting to insert an invalid word '!Hola':" << endl;
+    trie.Insert("!Hola");
+    cout << endl;
+
     cout << "Total words in trie: " << trie.Size() << endl;
     cout << endl;
     cout << "List of all words in Trie:" << endl;

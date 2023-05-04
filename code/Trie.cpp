@@ -10,7 +10,7 @@ Trie::~Trie() {}
 void Trie::Insert(const string& word) {
     // If word is invalid, don't do anything
     if (!ValidateWord(word)) { 
-        cout << "Words must be all lowercase letters with no symbols." << endl;
+        cout << "Inserting '" << word << "' failed! Words must be all lowercase letters with no symbols." << endl;
 
         return;
     }
@@ -26,39 +26,39 @@ void Trie::RecursiveInsert(shared_ptr<trie_node>& node, const string& word, int 
     if (current_letter_index >= word.length()) {
         return;
     }
-
+    
+    // Get the next letter to insert, which is the letter in the word at the current letter index
     char letter = word.at(current_letter_index);
 
-    // If letter is already in node, move to that node and check the next letter
+    // If letter is already in node, we don't need to insert a new node for it.
+    // Move to the cursor to that node and check the next letter in the sequence
     if (IsLetterInNode(letter, node)) {
-        // Grab the next node
-        int next_node_index = LetterIndex(letter);
-        shared_ptr<trie_node> next_node = node->children.at(next_node_index);
+        // Grab the next node, which is the node for the current letter since we need to check its children
+        shared_ptr<trie_node> node_for_current_letter = node->children.at(LetterIndex(letter));
 
         // If the new word is a subset of an existing word, and the next node is the end,
         // mark the node to an end of a word
         if (current_letter_index == word.length() - 1) {
-            next_node->is_end_of_word = true;
+            node_for_current_letter->is_end_of_word = true;
         }
 
-        RecursiveInsert(next_node, word, current_letter_index + 1);
+        RecursiveInsert(node_for_current_letter, word, current_letter_index + 1);
     }
-    // Letter is not in node, insert it 
+    // If letter is not in node, insert it 
     else {
         // Create a new node for the letter
         shared_ptr<trie_node> new_node = InitTrieNode(letter);
 
-        // If its the last letter in the word, mark the node as being end of the word
+        // If it's the last letter in the word, mark the node as being end of the word
         if (current_letter_index == word.length() - 1) {
             new_node->is_end_of_word = true;
         }
         
-        // Insert it at the correct position in the current node's children
+        // Insert the new letter node at the correct position in the parent node's children
         node->children.at(LetterIndex(letter)) = new_node;
 
         // Recursively insert any remaining letters
-        current_letter_index++;
-        RecursiveInsert(new_node, word, current_letter_index);
+        RecursiveInsert(new_node, word, current_letter_index + 1);
     }
 }
 
@@ -66,17 +66,17 @@ void Trie::Remove(const string& word) {
     // If word is invalid, don't do anything
     if (!ValidateWord(word)) { return; }
 
-    // If the work is not in the trie, don't do anything
+    // If the word is not in the trie, don't do anything
     if (!Search(word)) { return; }
 
-    // traverse tree and create map of letter nodes for each character in word.
+    // Traverse tree and create list of letter nodes for each character in word.
     vector<shared_ptr<trie_node>> letter_node_list = BuildLetterNodeList(word);
 
-    // Iterate the list starting at the last letter of the word
+    // Iterate through the list starting at the last letter of the word (done by iterating in reverse)
     for (int i = word.length() - 1; i >= 0; i--) {
         shared_ptr<trie_node> current_node = letter_node_list.at(i);
 
-        // If there are branches off of that letter, then nothing can be deleted from this point
+        // If there are branches off of the current letter node, then nothing can be deleted from this point
         vector<shared_ptr<trie_node>> child_letters = GetChildLetters(current_node);
         
         // If there are children, the current node can't be deleted, but we need to remove the is_end_of_word marker
@@ -86,7 +86,8 @@ void Trie::Remove(const string& word) {
             if (i == word.length() - 1) {
                 current_node->is_end_of_word = false;
             }
-
+            
+            // Break out of loop since we know no other nodes should be deleted
             break;
         }
         // If no children, we can remove the node if its not part of another word
@@ -99,8 +100,9 @@ void Trie::Remove(const string& word) {
 
             int letter_index = LetterIndex(current_node->letter);
 
-            // If we're at the first letter in the world, the parent is the root
+            // Get the parent for the current letter node, and "delete" the child (current node) by setting to null
             if (i == 0) {
+                // If we're at the first letter in the world, the parent is the root
                 shared_ptr<trie_node> parent_node = GetRoot();
                 parent_node->children.at(letter_index) = shared_ptr<trie_node>(NULL);
             }
@@ -152,7 +154,7 @@ bool Trie::Search(const string& word) {
     shared_ptr<trie_node> cursor = GetRoot();
     bool found = false;
 
-    // For each letter in the word, traverse the trie tree.
+    // For each letter in the word, traverse the trie tree in order of the letters.
     for (int i = 0; i < word.length(); i++) {
         char letter = word.at(i);
 
@@ -161,8 +163,8 @@ bool Trie::Search(const string& word) {
             int letter_index = LetterIndex(letter);
             cursor = cursor->children.at(letter_index);
 
-            // If each letter has been found up until now, and the last letter is at a node that is the end of the word, 
-            // the word was found.
+            // If each letter has been found up until now, and the last letter is at a node 
+            // that is the end of the word, the word was found.
             if (i == (word.length() - 1) && cursor->is_end_of_word) {
                 found = true;
             }
@@ -199,6 +201,7 @@ vector<string> Trie::SuggestionsForPrefix(string prefix) {
 }
 
 void Trie::RecursiveSuggestionsForPrefix(vector<string>& suggestions, shared_ptr<trie_node> prefix_last_letter, string prefix) {
+    // If the node for the current last letter is the end of a word, add it to the list
     if (prefix_last_letter->is_end_of_word) {
         suggestions.push_back(prefix);
     }
@@ -208,7 +211,7 @@ void Trie::RecursiveSuggestionsForPrefix(vector<string>& suggestions, shared_ptr
     // If there are no children we don't need to go any further
     if (children.empty()) { return; }
 
-    // Check each child
+    // If there are children, recursively check each child
     for (auto child : children) {
         // Build onto the prefix by adding the next letter in the sequence
         string prefix_with_child = prefix + child->letter;
@@ -219,9 +222,10 @@ void Trie::RecursiveSuggestionsForPrefix(vector<string>& suggestions, shared_ptr
 
 shared_ptr<trie_node> Trie::FindEndOfPrefix(string prefix) {
     shared_ptr<trie_node> cursor = GetRoot();
-
+    
+    // Traverse trie for each character in the prefix until we find the end
     for (int i = 0; i < prefix.length(); i++) {
-        // Get index of node for the current letter
+        // Get index of node for the current character
         int letter_index = LetterIndex(prefix.at(i));
         
         // The letter node is the current cursor's child at that index
@@ -234,31 +238,6 @@ shared_ptr<trie_node> Trie::FindEndOfPrefix(string prefix) {
     }
 
     return cursor;
-}
-
-vector<string> Trie::GetAllWords() {
-    shared_ptr<trie_node> cursor = GetRoot();
-    vector<string> words;
-    string word = "";
-
-    RecursiveGetAllWords(words, cursor, word);
-
-    return words;
-}
-
-void Trie::RecursiveGetAllWords(vector<string>& words, shared_ptr<trie_node> cursor, string word) {
-    if (cursor->is_end_of_word) {
-        words.push_back(word);
-    }
-
-    vector<shared_ptr<trie_node>> children = GetChildLetters(cursor);
-
-    // If there are no children we don't need to go any further
-    if (children.empty()) { return; }
-
-    for (auto child : children) {
-        RecursiveGetAllWords(words, child, word + child->letter);
-    }
 }
 
 int Trie::Size() {
@@ -278,6 +257,38 @@ void Trie::Print() {
     }
 }
 
+vector<string> Trie::GetAllWords() {
+    shared_ptr<trie_node> cursor = GetRoot();
+    vector<string> words;
+    string word = "";
+
+    RecursiveGetAllWords(words, cursor, word);
+
+    return words;
+}
+
+void Trie::RecursiveGetAllWords(vector<string>& words, shared_ptr<trie_node> cursor, string word) {
+    // If the cursor is an end-of-word node, add the word to the list
+    if (cursor->is_end_of_word) {
+        words.push_back(word);
+    }
+
+    // Grab all the child letter nodes of the cursor
+    vector<shared_ptr<trie_node>> children = GetChildLetters(cursor);
+
+    // If there are no children we don't need to go any further
+    if (children.empty()) { return; }
+
+    // Recursively collect words from the children
+    for (auto child : children) {
+        RecursiveGetAllWords(words, child, word + child->letter);
+    }
+}
+
+shared_ptr<trie_node> Trie::GetRoot() {
+    return root;
+}
+
 shared_ptr<trie_node> Trie::InitTrieNode(char letter) {
     shared_ptr<trie_node> new_node (new trie_node);
 
@@ -285,6 +296,7 @@ shared_ptr<trie_node> Trie::InitTrieNode(char letter) {
     new_node->letter = letter;
     new_node->children = vector<shared_ptr<trie_node>>(ALPHABET_SIZE);
 
+    // Make sure all the child nodes are itialized to null
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         new_node->children.at(i) = shared_ptr<trie_node>(NULL);
     }
@@ -292,15 +304,13 @@ shared_ptr<trie_node> Trie::InitTrieNode(char letter) {
     return new_node;
 }
 
-shared_ptr<trie_node> Trie::GetRoot() {
-    return root;
-}
-
 void Trie::SetRoot(shared_ptr<trie_node> new_root) {
     root = new_root;
 }
 
 bool Trie::ValidateWord(const string& word) {
+    // Check all the characters in the word. If any are not lowercase alphabet
+    // characters, the word is invalid.
     for (auto character : word) {
         if (character < 'a' || character > 'z') {
             return false;
