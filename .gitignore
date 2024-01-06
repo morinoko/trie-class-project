@@ -3,4 +3,6 @@ build/*
 ipch
 
 # exception to the rule
-!build/.gitkeep 
+!build/.gitkeep
+
+.DS_Store
